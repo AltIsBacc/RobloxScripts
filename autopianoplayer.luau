@@ -191,7 +191,7 @@ local function playSheet(sheet)
 end
 
 local isPlaying = false
-local sheetPlayTask = ThreadLib.NewThread(function(sheet) playSheet(sheet) end)
+local sheetPlayTask = ThreadLib.new(function(sheet) playSheet(sheet) end)
 
 -- Button handlers
 playButton.MouseButton1Click:Connect(function()

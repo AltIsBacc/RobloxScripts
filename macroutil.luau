@@ -31,7 +31,6 @@ M.KEY_MAPPINGS = {
     ["`"] = Enum.KeyCode.Backquote,
 }
 
--- Map special characters to their base key + shift requirement
 M.SHIFT_MAPPINGS = {
     ["!"] = Enum.KeyCode.One,
     ["@"] = Enum.KeyCode.Two,
