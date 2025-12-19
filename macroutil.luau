@@ -3,7 +3,7 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local M = {}
 
 type Key = string | Enum.KeyCode
-type RealKey = { key: Key, isUppercase: boolean }
+type RealKey = { key: Key, needsShift: boolean }
 type KeyInfo = { key: Key, triggerTime: number }
 
 M.KEY_MAPPINGS = {
@@ -28,14 +28,48 @@ M.KEY_MAPPINGS = {
     [","] = Enum.KeyCode.Comma,
     ["."] = Enum.KeyCode.Period,
     ["/"] = Enum.KeyCode.Slash,
+    ["`"] = Enum.KeyCode.Backquote,
+}
+
+-- Map special characters to their base key + shift requirement
+M.SHIFT_MAPPINGS = {
+    ["!"] = Enum.KeyCode.One,
+    ["@"] = Enum.KeyCode.Two,
+    ["#"] = Enum.KeyCode.Three,
+    ["$"] = Enum.KeyCode.Four,
+    ["%"] = Enum.KeyCode.Five,
+    ["^"] = Enum.KeyCode.Six,
+    ["&"] = Enum.KeyCode.Seven,
+    ["*"] = Enum.KeyCode.Eight,
+    ["("] = Enum.KeyCode.Nine,
+    [")"] = Enum.KeyCode.Zero,
+    ["_"] = Enum.KeyCode.Minus,
+    ["+"] = Enum.KeyCode.Equals,
+    ["{"] = Enum.KeyCode.LeftBracket,
+    ["}"] = Enum.KeyCode.RightBracket,
+    ["|"] = Enum.KeyCode.BackSlash,
+    [":"] = Enum.KeyCode.Semicolon,
+    ['"'] = Enum.KeyCode.Quote,
+    ["<"] = Enum.KeyCode.Comma,
+    [">"] = Enum.KeyCode.Period,
+    ["?"] = Enum.KeyCode.Slash,
+    ["~"] = Enum.KeyCode.Backquote,
 }
 
 function M:getProperKeyCode(key: string)
+    if self.SHIFT_MAPPINGS[key] then
+        return self.SHIFT_MAPPINGS[key], true
+    end
+    
     if self.KEY_MAPPINGS[key] then
-        return self.KEY_MAPPINGS[key]
+        return self.KEY_MAPPINGS[key], false
     end
 
-    return Enum.KeyCode[key:upper()]
+    if key:match("%u") then
+        return Enum.KeyCode[key:upper()], true
+    end
+
+    return Enum.KeyCode[key:upper()], false
 end
 
 function M:sendKeyEvent(keyCode: Enum.KeyCode, isHeld: boolean)
@@ -47,8 +81,7 @@ function M:triggerKey(keyInfo: KeyInfo)
     local needsShift = false
     
     if type(keyInfo.key) == "string" then
-        needsShift = keyInfo.key:match("%u") ~= nil
-        key = self:getProperKeyCode(keyInfo.key)
+        key, needsShift = self:getProperKeyCode(keyInfo.key)
     else
         key = keyInfo.key
     end
@@ -83,27 +116,25 @@ function M:triggerKeysSync(keys: {Key}, triggerTime: number)
         local needsShift = false
         
         if type(k) == "string" then
-            needsShift = k:match("%u") ~= nil
+            key, needsShift = self:getProperKeyCode(k)
             if needsShift and not hasShift then
                 hasShift = true
             end
-
-            key = self:getProperKeyCode(k)
         else
             key = k
         end
 
-        table.insert(realKeys, { key = key, isUppercase = needsShift })
+        table.insert(realKeys, { key = key, needsShift = needsShift })
     end
 
     for _, k in ipairs(realKeys) do
-        if k.isUppercase then
+        if k.needsShift then
             self:sendKeyEvent(Enum.KeyCode.LeftShift, true)
         end
 
         self:sendKeyEvent(k.key, true)
 
-        if k.isUppercase then
+        if k.needsShift then
             self:sendKeyEvent(Enum.KeyCode.LeftShift, false)
         end
     end
