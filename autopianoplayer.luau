@@ -168,9 +168,9 @@ local function setTransposition(value)
     end
 end
 
-local NOTE_DELAY = 0.05
-local CHORD_HOLD = 0.08
-local REST_DURATION = 0.1
+local NOTE_HOLD = 0.4
+local CHORD_HOLD = 0.6
+local REST_DURATION = 0.5
 
 local function playSheet(sheet)
     local parsedSheet = VPSheetParser:parse(sheet)
@@ -182,7 +182,7 @@ local function playSheet(sheet)
         end
 
         if #step == 1 then
-            MacroUtils:triggerKey({ key = step[1], triggerTime = NOTE_DELAY })
+            MacroUtils:triggerKey({ key = step[1], triggerTime = NOTE_HOLD })
             continue
         end
 
