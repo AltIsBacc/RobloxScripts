@@ -1,8 +1,8 @@
-local MacroUtils = require("./macroutil") or loadstring(game:HttpGet("https://raw.githubusercontent.com/AltIsBacc/roblox-scripts/master/macroutil.luau"))()
+local MacroUtils = --[[ require("./macroutil") or ]] loadstring(game:HttpGet("https://raw.githubusercontent.com/AltIsBacc/RobloxScripts/master/macroutil.luau"))()
 local MakeDraggable = loadstring(game:HttpGet("https://raw.githubusercontent.com/ThatMG393/roblox-scripts/master/Utils/MakeDraggable.luau"))()
 local Players = game:GetService("Players")
-local ThreadLib = require("./threadlib") or loadstring(game:HttpGet("https://raw.githubusercontent.com/AltIsBacc/roblox-scripts/master/threadlib.luau"))()
-local VPSheetParser = require("./vpsheetparser") or loadstring(game:HttpGet("https://raw.githubusercontent.com/AltIsBacc/roblox-scripts/master/vpsheetparser.luau"))()
+local ThreadLib = --[[ require("./threadlib") or ]] loadstring(game:HttpGet("https://raw.githubusercontent.com/AltIsBacc/RobloxScripts/master/threadlib.luau"))()
+local VPSheetParser = --[[ require("./vpsheetparser") or ]] loadstring(game:HttpGet("https://raw.githubusercontent.com/AltIsBacc/RobloxScripts/master/vpsheetparser.luau"))()
 
 local temp = Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("VirtualPianoPlayer")
 if temp then temp:Destroy() end
