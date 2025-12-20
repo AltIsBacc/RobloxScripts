@@ -65,7 +65,7 @@ local playButton = controlSection:CreateButton("Play", function(self)
 
     isPlaying = true
     self.UI.Text = "Playing..."
-    sheetPlayTask:Start(sheetBox.Text)
+    sheetPlayTask:Start(sheetBox:GetText())
 end)
 
 playButton:SetDisabled(true) -- safely disabled as sheetbox is empty by default
@@ -93,7 +93,7 @@ local settingsSection = settingsTab:CreateSection("Settings")
 local bpmBox = settingsSection:CreateInputField("BPM", "140", 140)
 bpmBox:RegisterOnPropertyChangeSignal("Text", function()
     local success, result = pcall(function()
-        return tonumber(bpmBox.Text) or 140
+        return assert(tonumber(bpmBox:GetText()))
     end)
 
     if success then
@@ -110,7 +110,7 @@ end)
 local transposeBox = settingsSection:CreateInputField("Transpose", "0", 0)
 transposeBox:RegisterOnPropertyChangeSignal("Text", function()
     local success, result = pcall(function()
-        return tonumber(transposeBox.Text)
+        return assert(tonumber(transposeBox:GetText()))
     end)
 
     if success then setTransposition(result) end
