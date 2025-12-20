@@ -7,7 +7,8 @@ export type Thread = {
 	Start: (self: Thread, ...any) -> (),
 	Stop: (self: Thread) -> (),
 	IsRunning: (self: Thread) -> boolean,
-	Destroy: (self: Thread) -> ()
+	Destroy: (self: Thread) -> (),
+	OnFinishCallback: (self: Thread, () -> ()) -> ()
 }
 
 type ThreadImpl = {
@@ -15,7 +16,8 @@ type ThreadImpl = {
 	_args: {any},
 	_thread: thread?,
 	_running: boolean,
-	_shouldStop: boolean
+	_shouldStop: boolean,
+	_onFinishedCallback: () -> ()
 }
 
 function M.new(func: (...any) -> (), ...: any): Thread
@@ -46,6 +48,7 @@ function M:Start(...: any)
 		-- Call the function with the arguments
 		self._func(table.unpack(args))
 		self._running = false
+		self._onFinishedCallback()
 	end)
 end
 
@@ -73,6 +76,10 @@ function M:Destroy()
 	self:Stop()
 	self._func = nil :: any
 	self._args = {}
+end
+
+function M:OnFinishCallback(func: () -> ())
+	self._onFinishedCallback = func
 end
 
 return M
