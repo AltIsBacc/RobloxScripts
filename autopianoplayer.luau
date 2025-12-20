@@ -1,7 +1,6 @@
 local MacroUtils = --[[ require("./macroutil") or ]] loadstring(game:HttpGet("https://raw.githubusercontent.com/AltIsBacc/RobloxScripts/master/macroutil.luau"))()
 local MakeDraggable = loadstring(game:HttpGet("https://raw.githubusercontent.com/ThatMG393/roblox-scripts/master/Utils/MakeDraggable.luau"))()
 local MGUI = --[[ require("./mgui") or ]] loadstring(game:HttpGet("https://raw.githubusercontent.com/AltIsBacc/RobloxScripts/master/mgui.luau"))()
-local MatchmakingService = game:GetService("MatchmakingService")
 local Players = game:GetService("Players")
 local ThreadLib = --[[ require("./threadlib") or ]] loadstring(game:HttpGet("https://raw.githubusercontent.com/AltIsBacc/RobloxScripts/master/threadlib.luau"))()
 local VPSheetParser = --[[ require("./vpsheetparser") or ]] loadstring(game:HttpGet("https://raw.githubusercontent.com/AltIsBacc/RobloxScripts/master/vpsheetparser.luau"))()
@@ -45,7 +44,6 @@ end
 local isPlaying = false
 local sheetPlayTask = ThreadLib.new(function(sheet) playSheet(sheet) end)
 
-
 -- UI BEGIN
 local winOpt = MGUI.DefaultWindowOptions
 winOpt.WindowTitle = "Auto Piano Player"
@@ -59,22 +57,12 @@ mainWindow.RootUI.Destroying:Connect(function()
 end)
 
 local mainSection = mainWindow:CreateSection("Main")
-
-local transposeBox = mainSection:CreateInputField("Transpose", "0", 0)
-transposeBox:RegisterOnPropertyChangeSignal("Text", function()
-    local success, result = pcall(function()
-        return tonumber(transposeBox.Text)
-    end)
-
-    if success then setTransposition(result) end
-end)
-
 local sheetBox = mainSection:CreateInputField("Sheet box", "[abc]", "")
 
 local controlSection = mainWindow:CreateSection("Controls")
 local playButton = controlSection:CreateButton("Play", function(self)
     if isPlaying then return end
-    
+
     isPlaying = true
     self.UI.Text = "Playing..."
     sheetPlayTask:Start(sheetBox.Text)
@@ -95,6 +83,37 @@ end)
 sheetPlayTask:OnFinishCallback(function()
     isPlaying = false
     playButton.UI.Text = "Play"
+
+    mainWindow:Notify("Finished playing.")
+end)
+
+local settingsTab = mainWindow:CreateTab("Settings")
+local settingsSection = settingsTab:CreateSection("Settings")
+
+local bpmBox = settingsSection:CreateInputField("BPM", "140", 140)
+bpmBox:RegisterOnPropertyChangeSignal("Text", function()
+    local success, result = pcall(function()
+        return tonumber(bpmBox.Text) or 140
+    end)
+
+    if success then
+        local beatDuration = 60 / result
+
+        NOTE_HOLD = beatDuration * 0.8
+        CHORD_HOLD = beatDuration * 0.9
+        REST_DURATION = beatDuration * 0.1
+
+        -- auto restart the song?
+    end
+end)
+
+local transposeBox = settingsSection:CreateInputField("Transpose", "0", 0)
+transposeBox:RegisterOnPropertyChangeSignal("Text", function()
+    local success, result = pcall(function()
+        return tonumber(transposeBox.Text)
+    end)
+
+    if success then setTransposition(result) end
 end)
 
 mainWindow:Notify("Auto Piano Player loaded!")

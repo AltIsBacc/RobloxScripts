@@ -1,3 +1,4 @@
+--!strict
 local UILibrary = {}
 
 local Players = game:GetService("Players")
@@ -50,7 +51,7 @@ function UILibrary.CreateWindow(Options)
 
 	local TabList = {}
 
-	local CurrentTheme = Options.Theme or UILibrary.Themes.Dark
+	local CurrentTheme = Options.WindowTheme or UILibrary.Themes.Dark
 
 	local IsCollapsed = false
 	local IsCollapsing = false
@@ -197,14 +198,13 @@ function UILibrary.CreateWindow(Options)
 		local TargetHeight = IsCollapsed and Options.CollapsedWindowSize.X or Options.WindowSize.Y
 		local TargetWidth = IsCollapsed and Options.CollapsedWindowSize.Y or Options.WindowSize.X
 		local TargetTitleHeight = IsCollapsed and 24 or 30
-		local TargetTextSize = IsCollapsed and math.clamp(14 - math.ceil(TargetWidth * 0.08), 4, math.huge) or 16
+		local TargetTextSize = IsCollapsed and math.clamp(math.ceil(TitleText.Size.Width.Offset * 0.3), 8, math.huge) or 16
 
 		TweenService:Create(MainFrame, AnimationInfo, { Size = UDim2.new(0, TargetWidth, 0, TargetHeight) }):Play()
 		TweenService:Create(TitleBar, AnimationInfo, { Size = UDim2.new(1, 0, 0, TargetTitleHeight) }):Play()
 		TweenService:Create(TitleText, AnimationInfo, { TextSize = TargetTextSize }):Play()
 
 		local CollapseAnim = TweenService:Create(CollapseButton, AnimationInfo, { Rotation = CollapseButton.Rotation + 180 })
-
 		CollapseAnim:Play()
 		CollapseAnim.Completed:Connect(function()
 			CollapseButton.Rotation = CollapseButton.Rotation >= 360 and 0 or CollapseButton.Rotation
@@ -276,6 +276,10 @@ function UILibrary.CreateWindow(Options)
 			TabButton.TextColor3 = CurrentTheme.DisabledText
 		end
 
+		function Tab:SetName(Name)
+			TabButton.Text = Name
+		end
+
 		function Tab:CreateSection(SectionName)
 			local Section = {}
 
@@ -318,7 +322,7 @@ function UILibrary.CreateWindow(Options)
 				SectionFrame.Size = UDim2.new(1, 0, 0, SectionList.AbsoluteContentSize.Y + 40)
 			end)
 
-			function Section:CreateLabel(LabelText, LabelTextSize)
+			function Section:CreateLabel(LabelText: string, LabelTextSize: number?)
 				local Label = {}
 				Label.UI = Instance.new("Frame")
 				Label.UI.Size = UDim2.new(1, 0, 0.3, 0)
@@ -474,7 +478,7 @@ function UILibrary.CreateWindow(Options)
 				return Toggle
 			end
 
-			function Section:CreateSlider(SliderText, MinValue, MaxValue, DefaultValue, Callback)
+			function Section:CreateSlider(SliderText: string, MinValue: number, MaxValue: number, DefaultValue: number, Callback: (number) -> ())
 				local Slider = {
 					Disabled = false,
 				}
@@ -540,7 +544,7 @@ function UILibrary.CreateWindow(Options)
 
 					TweenService:Create(Fill, TweenInfo.new(0.2, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), { Size = UDim2.new(SliderValue / 100, 0, 1, 0) }):Play()
 					ValueLabel.Text = tostring(SliderValue)
-
+					
 					Callback(SliderValue)
 				end
 
@@ -650,7 +654,8 @@ function UILibrary.CreateWindow(Options)
 		local TabAtIndex = table.remove(TabList, Index)
 		if TabAtIndex then
 			local TabButton = TabAtIndex.Button
-			TabContent["Elements-" .. TabButton.Name]:Destroy()
+			local Success, TabInstance = pcall(function() return TabContent["Elements-" .. TabButton.Name] end)
+			if Success then TabInstance:Destroy() end
 			TabButton:Destroy()
 			UpdateTabButtonSizes()
 		end
@@ -744,11 +749,17 @@ function UILibrary.CreateWindow(Options)
 		return NotificationInstance:ShowNotification(NotifOpts)
 	end
 
-	CollapseButton.MouseButton1Click:Connect(Window.Collapse)
-
 	MakeDraggable:MakeDraggableFromWithAnim(0.10, TitleBar, MainFrame)
 
+	CollapseButton.MouseButton1Click:Connect(Window.Collapse)
+
+	MainFrame.Transparency = 0
 	MainFrame.Visible = true
+	TweenService:Create(
+		MainFrame,
+		TweenInfo.new(0.65, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out),
+		{ Transparency = 100 }
+	):Play()
 
 	return Window
 end
