@@ -168,9 +168,9 @@ local function setTransposition(value)
     end
 end
 
-local NOTE_HOLD = 0.3
-local CHORD_HOLD = 0.45
-local REST_DURATION = 0.2
+local NOTE_HOLD = 0.2
+local CHORD_HOLD = 0.3
+local REST_DURATION = 0.08
 
 local function playSheet(sheet)
     local parsedSheet = VPSheetParser:parse(sheet)
