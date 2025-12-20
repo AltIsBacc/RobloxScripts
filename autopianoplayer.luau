@@ -69,7 +69,7 @@ transposeBox:RegisterOnPropertyChangeSignal("Text", function()
     if success then setTransposition(result) end
 end)
 
-local sheetBox = mainSection:CreateInputField("SheetBox", "[abc]", "")
+local sheetBox = mainSection:CreateInputField("Sheet box", "[abc]", "")
 
 local controlSection = mainWindow:CreateSection("Controls")
 local playButton = controlSection:CreateButton("Play", function(self)
@@ -92,10 +92,9 @@ sheetBox:RegisterOnPropertyChangeSignal("Text", function()
     playButton:SetDisabled(sheetBox:GetText() == "")
 end)
 
-
 sheetPlayTask:OnFinishCallback(function()
     isPlaying = false
-    playButton.UI.Text("Play")
+    playButton.UI.Text = "Play"
 end)
 
 mainWindow:Notify("Auto Piano Player loaded!")

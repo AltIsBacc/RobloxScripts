@@ -197,7 +197,7 @@ function UILibrary.CreateWindow(Options)
 		local TargetHeight = IsCollapsed and Options.CollapsedWindowSize.X or Options.WindowSize.Y
 		local TargetWidth = IsCollapsed and Options.CollapsedWindowSize.Y or Options.WindowSize.X
 		local TargetTitleHeight = IsCollapsed and 24 or 30
-		local TargetTextSize = IsCollapsed and math.clamp(14 - math.ceil(TargetWidth * 0.3), 4, math.huge) or 16
+		local TargetTextSize = IsCollapsed and math.clamp(14 - math.ceil(TargetWidth * 0.08), 4, math.huge) or 16
 
 		TweenService:Create(MainFrame, AnimationInfo, { Size = UDim2.new(0, TargetWidth, 0, TargetHeight) }):Play()
 		TweenService:Create(TitleBar, AnimationInfo, { Size = UDim2.new(1, 0, 0, TargetTitleHeight) }):Play()
