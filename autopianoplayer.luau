@@ -47,10 +47,12 @@ local sheetPlayTask = ThreadLib.new(function(sheet) playSheet(sheet) end)
 
 
 -- UI BEGIN
-local mainWindow = MGUI.CreateWindow({
-    WindowSize = { X = 400, Y = 300 },
-    ResetOnSpawn = false
-})
+local winOpt = MGUI.DefaultWindowOptions
+winOpt.WindowTitle = "Auto Piano Player"
+winOpt.WindowSize = { X = 400, Y = 300 }
+winOpt.ResetOnSpawn = false
+
+local mainWindow = MGUI.CreateWindow(winOpt)
 
 mainWindow.RootUI.Destroying:Connect(function()
     sheetPlayTask:Stop()
@@ -96,4 +98,4 @@ sheetPlayTask:OnFinishCallback(function()
     playButton.UI.Text("Play")
 end)
 
-print("Virtual Piano Player loaded!")
+mainWindow:Notify("Auto Piano Player loaded!")
