@@ -3,10 +3,9 @@ local AnimationController = loadstring(game:HttpGet("https://raw.githubuserconte
 local PlayerGetter = loadstring(game:HttpGet("https://raw.githubusercontent.com/AltIsBacc/RobloxScripts/master/playergetter.luau"))()
 
 local Players = game:GetService("Players")
+local PlayersExt = PlayerGetter.Init(Players)
 
 local function Main()
-	PlayerGetter = PlayerGetter.Init(Players)
-
 	local WinOpt = MGUI.DefaultWindowOptions
 	WinOpt.WindowTitle = "Simple Sex GUI"
 	WinOpt.WindowSize = { X = 317, Y = 280 }
@@ -44,7 +43,7 @@ local function Main()
 
 				local PlayerName = Players:FindFirstChild(TargetPlayer:GetText())
 				if not PlayerName then
-					PlayerName = Players:FindFirstChild(PlayerGetter:GetPlayerFromDisplayName(TargetPlayer:GetText()))
+					PlayerName = Players:FindFirstChild(PlayersExt:GetPlayerFromDisplayName(TargetPlayer:GetText()))
 				end
 
 				A:FollowTarget(PlayerName.Name, CFrame.new(0, 0, 1.1))

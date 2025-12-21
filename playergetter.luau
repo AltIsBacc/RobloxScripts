@@ -18,7 +18,7 @@ function PlayerGetter.Init(PlayerManager: Players)
 		self.DisplayNameCache[Player.DisplayName] = nil
 	end)
 
-	return self
+	return self :: any
 end
 
 function PlayerGetter:GetPlayerFromDisplayName(DisplayName: string): Player
