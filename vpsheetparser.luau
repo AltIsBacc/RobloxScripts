@@ -1,4 +1,4 @@
-function tprint (tbl, indent)
+function tprint(tbl, indent)
   if not indent then indent = 0 end
   for k, v in pairs(tbl) do
     local formatting = string.rep("  ", indent) .. k .. ": "
@@ -12,10 +12,11 @@ function tprint (tbl, indent)
 end
 
 local M = {}
+M.__index = M
 
-type ParsedSheet = {{string}}
+export type ParsedSheet = {{string}}
 
-function M:parse(sheet: string): ParsedSheet
+function M.parse(sheet: string): ParsedSheet
     if not sheet or sheet == "" then
         return {{}}
     end
@@ -52,6 +53,9 @@ function M:parse(sheet: string): ParsedSheet
                     i = i + 1
                 end
             end
+        elseif curChar == " " then
+            table.insert(result, {})
+            i = i + 1
         else
             -- Regular character
             table.insert(result, { curChar })

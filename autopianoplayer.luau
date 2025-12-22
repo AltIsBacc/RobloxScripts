@@ -24,7 +24,7 @@ local CHORD_HOLD = 0.3
 local REST_DURATION = 0.08
 
 local function playSheet(sheet)
-    local parsedSheet = VPSheetParser:parse(sheet)
+    local parsedSheet = VPSheetParser.parse(sheet)
 
     for _, step in ipairs(parsedSheet) do
         if #step == 0 then
