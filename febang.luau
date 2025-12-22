@@ -1,11 +1,28 @@
 local MGUI = --[[ require("./mgui") or ]] loadstring(game:HttpGet("https://raw.githubusercontent.com/AltIsBacc/RobloxScripts/master/mgui.luau"))()
-local AnimationController = loadstring(game:HttpGet("https://raw.githubusercontent.com/ThatMG393/roblox-scripts/master/Utils/AnimationController.luau"))()
-local PlayerGetter = loadstring(game:HttpGet("https://raw.githubusercontent.com/AltIsBacc/RobloxScripts/master/playergetter.luau"))()
-
+local AnimationController = --[[ require("./animutilv2.luau") -- or ]] loadstring(game:HttpGet("https://raw.githubusercontent.com/AltIsBacc/RobloxScripts/master/animutilv2.luau"))()
 local Players = game:GetService("Players")
-local PlayersExt = PlayerGetter.Init(Players)
+
+type DisplayNameMapping = { [string]: string }
+
+local DisplayNameMap: DisplayNameMapping = {}
+
+local function initDisplayNameMap()
+	for _, Player in Players:GetPlayers() do
+		DisplayNameMap[Player.DisplayName] = Player.Name
+	end
+
+	Players.PlayerAdded:Connect(function(NewPlayer: Player)
+		DisplayNameMap[NewPlayer.DisplayName] = NewPlayer.Name
+	end)
+
+	Players.PlayerRemoving:Connect(function(Player: Player)
+		DisplayNameMap[Player.DisplayName] = nil
+	end)
+end
 
 local function Main()
+	initDisplayNameMap()
+
 	local WinOpt = MGUI.DefaultWindowOptions
 	WinOpt.WindowTitle = "Simple Sex GUI"
 	WinOpt.WindowSize = { X = 317, Y = 280 }
@@ -18,37 +35,41 @@ local function Main()
 	local TargetPlayer = MainSec:CreateInputField("Target Player", Players.LocalPlayer:GetFullName().split(".")[2], nil)
 	local BangSpeed = MainSec:CreateInputField("Bang Speed", 10, 10)
 
-	local function redir(a)
-		Status:UpdateLabel(a)
-	end
+	local function redir(a: string) Status:UpdateLabel(a) end
 
 	local WeStoppingNow = false
-	local A = nil
+	
+	local FollowTask: thread? = nil
+	local Anim = AnimationController.new {
+		owner = Players.LocalPlayer,
+		speed = BangSpeed:GetText(),
+		r6AnimId = "rbxassetid://148840371",
+		r15AnimId = "rbxassetid://5918726674",
+
+		onError = redir,
+		onStatusChange = redir,
+	}
+
+	
 	MainSec:CreateButton("Commence 😈", function()
-		if WeStoppingNow or A ~= nil then
-			A:Stop()
-			A = nil
+		if WeStoppingNow then
+			Anim:Stop()
+			if FollowTask then task.cancel(FollowTask) end
+
 			Status:UpdateLabel("stopped banging 😈")
 			workspace.FallenPartsDestroyHeight = -500
 		else
-			A = AnimationController.new {
-				Speed = BangSpeed:GetText(),
-				R6AnimId = "rbxassetid://148840371",
-				R15AnimId = "rbxassetid://5918726674",
-				OnError = redir,
-				OnStatusChange = redir,
-			}
-			if A ~= nil then
-				A:Start()
+			Anim._config.speed = tonumber(BangSpeed:GetText()) or 1
+			Anim:Start()
 
-				local PlayerName = Players:FindFirstChild(TargetPlayer:GetText())
-				if not PlayerName then
-					PlayerName = Players:FindFirstChild(PlayersExt:GetPlayerFromDisplayName(TargetPlayer:GetText()))
-				end
-
-				A:FollowTarget(PlayerName.Name, CFrame.new(0, 0, 1.1))
-				Status:UpdateLabel("we fucking now 😈😈😈")
+			local Target = Players:FindFirstChild(TargetPlayer:GetText())
+			if not Target then
+				Target = Players:FindFirstChild(DisplayNameMap[TargetPlayer:GetText()])
 			end
+
+			FollowTask = Anim:FollowTarget(Target, CFrame.new(0, 0, 1.1))
+			Status:UpdateLabel("we fucking now 😈😈😈")
+			
 			workspace.FallenPartsDestroyHeight = -1000
 		end
 		WeStoppingNow = not WeStoppingNow
